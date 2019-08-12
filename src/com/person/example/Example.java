@@ -2,11 +2,26 @@ package com.person.example;
 
 import java.util.Objects;
 
-public class Example {
+/**
+ * @author hq
+ */
+@Auth
+public class Example<K,V>{
 
-    private String  name;
+    private  String  name;
 
-    private Integer  age;
+    private  Integer  age;
+
+    public Example(){
+
+    }
+    private Example(String name){
+        this.name=name;
+    }
+    public Example(String name,Integer  age){
+        this.name = name;
+        this.age=age;
+    }
 
     public String getName() {
         return name;
@@ -39,4 +54,15 @@ public class Example {
         return Objects.hash(getName(), getAge());
     }
 
+    public void show(String msg){
+        System.out.println(msg);
+    }
+
+    @Override
+    public String toString() {
+        return "Example{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
 }

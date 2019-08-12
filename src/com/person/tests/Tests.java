@@ -1,6 +1,14 @@
 package com.person.tests;
 
+import com.person.example.Auth;
+import com.person.example.Example;
+import com.person.example.Simple;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.*;
+import java.net.URL;
 
 public class Tests {
     /**
@@ -98,9 +106,108 @@ public class Tests {
     }
 
     @Test
-    public void test02(){
+    public void test02() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException {
         /**
-         * Class
+         * Class type:
+         *
+         *      01：Class类就是一个类关键在于这个Class类可以泛指一切（指的是会根据不同的类型，从而会生成不同的Class对象），
+         *      02：
+         *          实际上所有的类都是在对其第一次使用时动态加载到JVM中的，当程序创建第一个对类的静态成员引用时，就会加载这个被使用的类，
+         *        注意：使用new操作符创建类的新实例对象也会被当作对类的静态成员的引用(构造函数也是类的静态方法)；
+         *     03:reflect（发射机制）：
+         *         注意点：
+         *              forName方法(重点静态方法)：可以根据指定forName的形参(类名，完全限定名(包名+类名)),获取对应的class对象
+         *
+         *              Declared关键字：用于访问非public的 filed、constructor、method
+         *
+         *              setAccessible方法：主要运用于类的私有属性、构造器和方法
+         *                          作用：
+         *                              通过形参，决定是否需要进行java语言的检查；
+         *             isInstance方法：表示形参是否属于该类的自子集；
+         *
+         *                形参：为Object类型(不是Class类型)
+         *
+         *
+         *
+         *
+         *
+         *
+         *
+         *
          */
+        System.out.println(Example.class.toString());
+        Example example = Example.class.newInstance();
+        Field name = Example.class.getDeclaredField("name");
+        name.setAccessible(true);
+        name.set(example,"xiaoming");
+        System.out.println(example.toString());
+        Constructor<Example> constructor = Example.class.getConstructor(String.class, Integer.class);
+        System.out.println(constructor.newInstance("hello",18));
+        if(Example.class.isInstance(new Simple())) System.out.println("Class对象的isInstance方法与instanceOf关键字等价");
+        //ThisTest thisTest = new ThisTest(18);
+        System.out.println();
+    }
+
+    /**
+     * reflex mechanism(反射机制)：
+     *
+     */
+    @Test
+    public void test3() throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException, IOException {
+
+        String result = Example.class.toString();//class com.person.example.Example（数据类型+完全限定名）
+        String result1 = Example.class.toGenericString();//public class com.person.example.Example （modifier(修饰符)+数据类型+完全限定名）
+
+        //通过forName方法指定对应的类的完全限定名(包名+类名)获取指定类对象
+        Class<?> forNameClass = Class.forName("com.person.example.Example");// 结果：class com.person.example.Example
+        //通过newInstance可以获取该类对象的实例(默认使用null constructor（空构造器）)
+        Example example = Example.class.newInstance();// com.person.example.Example@3c1
+        //通过isInstance方法判定指定对象是否为该类对象的子集；
+        boolean result3 = Object.class.isInstance(Example.class);// true
+        //isAssignableFrom方法用来判断一个类Class1和另一个类Class2是否相同或是另一个类的超类或接口
+        boolean result4 = Example.class.isAssignableFrom(Example.class);//true
+        //通过getName方法获取类名
+        String result5 = forNameClass.getName();//com.person.example.Example
+        //通过getClassLoader方法获取该类对象的类加载器
+        ClassLoader classLoader = Example.class.getClassLoader();//sun.misc.Launcher$AppClassLoader@18b4aac2
+        //通过getTypeParameters方法获取该类对象定义的泛型变量的数组
+        TypeVariable<Class<Example>>[] typeParameters = Example.class.getTypeParameters();
+        for (TypeVariable<Class<Example>> type:typeParameters){
+            System.out.println(type.toString());
+        }
+        //通过getSuperclass方法获取该类对象的父类
+        Class<? super Example> superclass = Example.class.getSuperclass();//class java.lang.Object
+        Type genericSuperclass = Example.class.getGenericSuperclass();//class java.lang.Object
+        //通过getComponentType方法返回组件类型；
+        Class<?> componentType = Example.class.getComponentType();//null
+        //通过getModifiers方法获取该类对象修饰符的数量
+        int modifiers = Example.class.getModifiers();//1
+        //通过getSigners方法获取类签名
+        //Object[] signers = Example.class.getSigners();
+        String simpleName = Example.class.getSimpleName();//Example
+        String typeName = Example.class.getTypeName();//com.person.example.Example
+        /**
+         * 通过getConstructorf方法获取指定的Constructor对象(可以指定参数，但是必须在元java程序中编写带参构造器)；
+         * 通过getDeclaredConstructor方法获取指定非public的Constructor对象：
+         *              注意：通过setAccessible方法设置跳过java语言检查；
+         */
+        Constructor<Example> constructor = Example.class.getConstructor(String.class, Integer.class);
+        Example example1 = constructor.newInstance("xiaoming", 123);
+
+        Constructor<Example> declaredConstructor = Example.class.getDeclaredConstructor(String.class);
+        declaredConstructor.setAccessible(true);
+        Example example2 = declaredConstructor.newInstance("xiaofang");
+        //通过getAnnotation方法获取声明在该类的注解类
+        Auth annotation = Example.class.getAnnotation(Auth.class);
+        //D:\workspace\java-api\src\com\person\example\Example.java
+        //通过getResource方法获取对应资源文件的路径形参(为文件名)
+        URL resource = Example.class.getResource("/a.properties");
+        //通过getResource方法获取对应资源文件的字节输入流形参(为文件名)
+        InputStream resourceAsStream = Example.class.getResourceAsStream("/a.properties");
+
+        byte[] bytes = new byte[20];
+        //通过read方法获取文件的数据形参为接受多少字节数据；
+        int read = resourceAsStream.read(bytes);
+        System.out.println(read);
     }
 }

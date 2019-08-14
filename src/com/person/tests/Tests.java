@@ -8,9 +8,14 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.*;
+import java.math.BigDecimal;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class Tests {
+
+
     /**
      * java eight primitive type test：
      */
@@ -209,5 +214,171 @@ public class Tests {
         //通过read方法获取文件的数据形参为接受多少字节数据；
         int read = resourceAsStream.read(bytes);
         System.out.println(read);
+    }
+
+    @Test
+    public void test4(){
+        /**
+         * Integer API
+         */
+        //---------Field-------------
+        int bytes = Integer.BYTES;// 4 （byte）
+        int size = Integer.SIZE;//32(bit)
+        int minValue = Integer.MIN_VALUE;// -2147483648
+        int maxValue = Integer.MAX_VALUE;//2147483647
+
+        //----------Method-------------
+
+        //比较适用的几种方法
+        int a =2;
+        int b = 5;
+        String s = "1234";
+        int min = Integer.min(a, b);//2
+        int max = Integer.max(a, b);//5
+        int sum = Integer.sum(a, b);//7
+        int i = Integer.parseInt(s);//1234
+        Integer integer = Integer.valueOf(s);//1234
+        long l = integer.longValue();//1234
+        /**
+         * BigDecimal:
+         *          测试得出以下结论：
+         *            常用的加减乘除运算方法：
+         *                  add()、subtract()、multiply()、divide();
+         *            注意：
+         *
+         *              01：除了divide(除法)内包含有设置精确到几位小数，其他几个方法都必须通过setScale方法进行设置；
+         *              02：精确到几位小数，当前的BigDecimal数值超过你要保留的小数点位才会保留你要保留结果的小数点位数；
+         *              03：四舍五入的方式，建议使用ROUND_HALF_UP；
+         *
+         */
+        //----------BigDecimal------------
+        BigDecimal test1 = new BigDecimal("7.000");
+        BigDecimal test2 = new BigDecimal("3.0");
+        BigDecimal scale = test1.setScale(2);
+        Double result= test1.add(test2).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+       Double result1 = test1.subtract(test2).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+       Double result2 =test1.multiply(test2).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+       Double result3 =test1.divide(test2,2,BigDecimal.ROUND_HALF_UP).doubleValue();
+        System.out.println(result+"\t"+result1+"\t"+result2+"\t"+result3+"\t"+scale);
+
+        //----------Random-------------
+        Random random = new Random();
+        System.out.println(random);
+        int i1 = (int) (Math.random() * 50+50);
+        System.out.println(random.nextDouble()+51.0);
+        System.out.println(random.nextBoolean());
+        System.out.println(random.nextFloat());
+        System.out.println(random.nextInt()+50);
+        System.out.println(random.nextLong());
+        System.out.println(random.nextInt(50)+50);
+        System.out.println(i1);
+
+    }
+
+    @Test
+    public void test5(){
+        /**
+         * String api:
+         *
+         *    概念：字符串是常量,字符串的对象是不可变对象
+         */
+        //声明字符串常量(注意常量是共享的)
+          String var = "hello";
+        //通过字符串字符串对象
+        String varObj = new String("hello");
+        //---------Field---------
+        
+        //获取String数据类型比较器对象
+        Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
+        int order = comparator.compare("abc", "bc");// -1 (表示前者小于后者)
+
+      //------------Mehtod--------------
+
+      //---------static - method ----------------
+
+       //通过copyValueOf方法 AND copyValueOf方法将字符数组转换为字符串(两个方法的区别：前者获取全部，后者可以选择性的截取)；
+        char[] chars = new char[]{'a','p','p','l','e','i','s','r','e','d'};
+        String copyVar = String.copyValueOf(chars);
+        String copyVar2 = String.copyValueOf(chars,0,5);
+        System.out.println(copyVar+"\r\n"+copyVar2);
+
+
+        //通过format方法定义指定的格式将对象字符串格式化
+        String date = String.format("%1$tY-%1$tm-%1$te %1$tH:%1$tM:%1$tS", new Date(System.currentTimeMillis()));
+        String date1 = String.format(Locale.GERMANY, "%1$tY-%1$tm-%1$te %1$tH:%1$tM:%1$tS", new Date(System.currentTimeMillis()));
+
+       //通过join方法可以将多个字符串或字符串集合/数组与自定的字符
+        String[] strings = new String[]{"apple","banana","per"};
+        String hello = String.join("-", "hello","java");//hello-java
+        String stringArray = String.join("-", strings);//apple-banana-per
+
+        //--------non-static-method------------------
+        //通过compareTo和compareToIgnoreCase方法比较两个字符串按照原有的字符串顺序比大小(区别后者方法忽略大小写)
+      int var1 =  varObj.compareTo("jkm");//-2
+      int var2 = varObj.compareToIgnoreCase("ABCD");//7
+
+      //通过concat方法进行字符串拼接，拼接的字符串在末尾处进行拼接
+        String world = varObj.concat("world");//helloworld
+        //通过contains方法表示该字符串对象是否包含此字符序列
+        boolean he = varObj.contains("he");
+        //通过contentEquals方法表示该字符串对象内容是否与该字符串一致；
+        boolean llo = varObj.contentEquals("hello");
+        //通过endsWith方法判断该字符串对象是否以形参内容为后缀
+        boolean llo1 = varObj.endsWith("llo");
+        //通过getBytes方法将该字符串对象转换成字节数组；
+        byte[] bytes = varObj.getBytes();
+        byte[] bytes1 = varObj.getBytes(StandardCharsets.UTF_8);
+
+        //通过indexOf AND  lastIndexOf方法根据指定的字符返回该字符串对象第一次和最后一次出现的索引位置
+        int l = varObj.indexOf("l");//2
+        int l1 = varObj.lastIndexOf('l');//3
+
+
+        boolean empty = varObj.isEmpty();
+        String[] ls = varObj.split("l");
+
+
+        //-------------StringBuffer------------------
+        StringBuffer sb = new StringBuffer();
+         for(int i =1;i<=10;i++){
+             //通过append方法添加数值
+             sb.append("concept"+i);
+         }
+
+         //通过reverse方法将该对象倒序排列
+         sb.reverse();
+        sb.insert(2,'h');
+        System.out.println(sb);
+    }
+
+    /**
+     * Base64加密解密
+     */
+    @Test
+    public void test6(){
+
+        String str = "helloWorld";
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encode = encoder.encode(str.getBytes());
+        Base64.Decoder decoder = Base64.getDecoder();
+        byte[] decode = decoder.decode(encode);
+        String result = new String(decode);
+        for (byte b : encode) {
+            System.out.println(b);
+        }
+        String url = "http://localhost:8888/index";
+
+        Base64.Encoder urlEncoder = Base64.getUrlEncoder();
+        byte[] encode1 = urlEncoder.encode(url.getBytes());
+        Base64.Decoder urlDecoder = Base64.getUrlDecoder();
+        byte[] decode1 = urlDecoder.decode(encode1);
+        String resultUrl = new String(decode1);
+        System.out.println(resultUrl);
+    }
+    @Test
+    public  void test7(){
+
+
+
     }
 }

@@ -1,8 +1,6 @@
 package com.person.tests;
 
-import com.person.example.Auth;
-import com.person.example.Example;
-import com.person.example.Simple;
+import com.person.example.*;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -12,6 +10,9 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 public class Tests {
 
@@ -378,7 +379,182 @@ public class Tests {
     @Test
     public  void test7(){
 
+        /**
+         * Array api:
+         *
+         *    Array概念：
+         *          所谓数组就是将相同数据类型的变量集合起来；
+         *
+         *
+         */
+        //--------数组的声明----------
 
+        /**
+         *  动态初始化:
+         *          01:先开辟空间；（开辟heap空间）
+         *          02：在动态赋值（初始化时有默认值）
+         *   数组的知识：
+         *          01：数组是有序的集合；
+         *          02：索引是对应数组中元素的位置(索引：从0开始到数组的长度-1)；
+         *          03：可以根据索引设置或获取对应的元素数值；
+         *          04：数组是固定长度的集合
+         *
+         */
+
+        int[] obj = new int[3];
+        obj[0]=1;
+        obj[1]=1;
+        obj[2]=1;
+        /**
+         * 静态初始化：
+         *      就是无需先开辟空间，而是直接赋值，且按照赋值的从左到右的顺序给与对应数值在该数组分配位置（就是索引），
+         *     数组的长度就是赋值数值的数量
+         */
+        //-----第一种形态-----------
+        int []staticObj ={1,2,3};
+        //-----第二种形态-----------
+        int[]staticObj2 = new int[]{1,2,3};
+        /**
+         * Arrays api:
+         *      就是operation array对象
+         */
+        //通过asList创建指定数据类型的list集合（根据形参类型决定所创建的list集合数据类型）
+        List<Integer> integers = Arrays.asList(1, 2, 3, 4);
+        /**
+         * 通过binarySearch方法：
+         *          将指定的数值在指定的数组的查找返回其对应的索引位置；
+         *
+         *                返回的结果>=0:为指定数据的索引位置；
+         *                返回的结果<0;则表示该数组中没有这个数值
+         */
+        int i1 = Arrays.binarySearch(staticObj, 2);
+        //通过copyOf方法获取一个新数组
+        int[] ints = Arrays.copyOf(staticObj, staticObj.length);
+        //通过copyOfRange从指定的数组进行截取获取新数组
+        int[] ints1 = Arrays.copyOfRange(staticObj, 0, 1);
+        //通过fill方法将指定数组中的元素全部替换成指定的数值；
+         Arrays.fill(staticObj,4);
+        ArrayObject[] objects = {new ArrayObject("xiaoming",12,5),new ArrayObject("xiaowang",14,4),
+                new ArrayObject("xiaozhang",16,6),new ArrayObject("xiaofang",18,2),
+                new ArrayObject("xiaozhang",8,8)};
+        for (ArrayObject object : objects) {
+            System.out.println("未进行重排序的数组："+object);
+        }
+        /*Arrays.parallelSort(objects, new Comparator<ArrayObject>() {
+            @Override
+            public int compare(ArrayObject o1, ArrayObject o2) {
+                if(o1.getOrder() >o2.getOrder())
+                    return -1;
+                if(o1.getOrder() == o2.getOrder())
+                    return 0;
+                return 1;
+
+            }
+        });*/
+        Arrays.sort(objects, new Comparator<ArrayObject>() {
+            @Override
+            public int compare(ArrayObject o1, ArrayObject o2) {
+                if(o1.getOrder() >o2.getOrder())
+                    return -1;
+                if(o1.getOrder() == o2.getOrder())
+                    return 0;
+                return 1;
+            }
+        });
+        for (ArrayObject object : objects) {
+            System.out.println("进行重排序的数组："+object);
+        }
+        IntStream stream = Arrays.stream(staticObj);
+        stream.forEach((integer)->{
+            System.out.println(integer);
+        });
+        //assert ints == null;
+
+    }
+    @Test
+    public void test8() {
+
+        /**
+         * Collection api:
+         *
+         */
+
+        //-----------Set-----------------
+        Set<CollectionObject> hashSet = new HashSet<>();
+        hashSet.add(new CollectionObject("096","hefei","555",5.0));
+        hashSet.add(new CollectionObject("096","hefei","666",6.0));
+        hashSet.add(new CollectionObject("096","hefei","777",2.0));
+        hashSet.add(new CollectionObject("096","hefei","888",8.0));
+        hashSet.add(new CollectionObject("096","hefei","999",1.0));
+        for (CollectionObject object : hashSet) {
+            System.out.println("未排序集合："+object);
+        }
+
+        Iterator<CollectionObject> setIter = hashSet.iterator();
+        while (setIter.hasNext())
+            System.out.println("已排序的集合："+setIter.next());
+        //---------List--------------
+        List<Integer> list = new ArrayList<>();
+        for(int i=1;i<=10;i++){
+            list.add(i);
+        }
+        Iterator<Integer> iterator = list.iterator();
+        AtomicInteger count = new AtomicInteger(0);
+        while (iterator.hasNext()){
+            count.incrementAndGet();
+            if(9 == count.intValue()){
+                iterator.remove();
+            }
+            Integer next = iterator.next();
+            System.out.print("未排序前："+next+"\t");
+        }
+        list.sort(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                if(o1>o2)
+                    return -1;
+                if(o1 == o2)
+                    return 0;
+                return 1;
+            }
+        });
+        System.out.println();
+        for (Integer integer : list) {
+            System.out.print("已排序："+integer+"\t");
+        }
+    }
+
+    @Test
+   public void test9(){
+
+        Map<String, String> map = new ConcurrentHashMap<>();
+        map.put("a","apple");
+        map.put("b","banana");
+        map.put("h","hello");
+        //通过entrySet方法返回一组键值对的set集合；
+        Set<Map.Entry<String, String>> entries = map.entrySet();
+        //通过keySet方法获取一组键的set集合
+        Set<String> keySet = map.keySet();
+        //通过values方法获取一组映射值的集合；
+        Collection<String> values = map.values();
+        for (Map.Entry<String, String> entry : entries) {
+            System.out.println("获取key值："+entry.getKey()+"===========获取映射值："+entry.getValue());
+        }
+        for (String key : keySet) {
+            System.out.println("获取key值："+key);
+        }
+        for (String value : values) {
+            System.out.println("获取key值："+value);
+        }
+        //通过replace方法将该map对象指定key映射的值替换成新值
+        boolean replace = map.replace("a", "apple", "afei");
+
+
+        boolean a = map.containsKey("a");
+        boolean b = map.containsValue("world");
+        System.out.println(a+"========="+b);
+        int size = map.size();
+        System.out.println(size);
 
     }
 }
